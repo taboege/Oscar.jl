@@ -2,6 +2,8 @@ using Oscar
 using Test
 using Documenter
 
+GC.enable_logging(true)
+
 
 import Oscar.Nemo.AbstractAlgebra
 include(joinpath(pathof(AbstractAlgebra), "..", "..", "test", "Rings-conformance-tests.jl"))
