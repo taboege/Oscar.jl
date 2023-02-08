@@ -24,15 +24,13 @@ jobs:
       matrix:
         julia-version:
           - 'nightly'
+          - '~1.9.0-0'
+          - '~1.8.0-0'
         julia-arch:
           - x64
         os:
           - ubuntu-latest
-        include:
-          # Add a few macOS jobs (not too many, the number we can run in parallel is limited)
-          - julia-version: 'nightly'
-            julia-arch: x64
-            os: macOS-latest
+          - macOS-latest
 
     steps:
       - uses: actions/checkout@v3
@@ -62,8 +60,6 @@ jobs:
           top -l 2 -u -n 20
       - name: "debug stuff2"
         run: julia -e 'using InteractiveUtils; versioninfo(verbose=true)'
-      - name: "whatever ...."
-        run: julia --project=@. -e 'using Pkg; Pkg.add(name="msolve_jll", version="0.4.8"); Pkg.pin(name="msolve_jll", version="0.4.8")'
       - name: "Run tests"
         uses: julia-actions/julia-runtest@latest
       - name: "debug stuff3"
