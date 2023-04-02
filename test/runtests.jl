@@ -2,7 +2,21 @@ using Oscar
 using Test
 using Documenter
 
+using Printf
+
+GC.enable_logging(true)
+
 import Random
+
+function meminfo_julia()
+  # @printf "GC total:  %9.3f MiB\n" Base.gc_total_bytes(Base.gc_num())/2^20
+  # Total bytes (above) usually underreports, thus I suggest using live bytes (below)
+  @printf "GC live:   %9.3f MiB\n" Base.gc_live_bytes()/2^20
+  @printf "JIT:       %9.3f MiB\n" Base.jit_total_bytes()/2^20
+  @printf "Max. RSS:  %9.3f MiB\n" Sys.maxrss()/2^20
+  @printf "Free mem:  %9.3f MiB\n" Sys.free_memory()/2^20
+  @printf "Free pmem: %9.3f MiB\n" Sys.free_physical_memory()/2^20
+end
 
 if haskey(ENV, "JULIA_PKGEVAL") ||
     get(ENV, "CI", "") == "true" ||
@@ -48,6 +62,7 @@ end
 const innermost = Ref(true)
 # redefine include to print and collect some extra stats
 function include(str::String)
+  meminfo_julia()
   innermost[] = true
   # we pass the identity to avoid recursing into this function again
   @static if compiletimes
