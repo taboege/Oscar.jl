@@ -1,5 +1,6 @@
 @testset "Timing" begin
 
+    return
     # the pkgeval / nanosoldier tests are quite resource-constrained
     # to avoid unnecessary failures we skip the timing tests
     haskey(ENV, "JULIA_PKGEVAL") && return

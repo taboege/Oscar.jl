@@ -4,6 +4,10 @@ using Documenter
 
 using Printf
 
+import InteractiveUtils
+
+InteractiveUtils.versioninfo(verbose=true)
+
 GC.enable_logging(true)
 
 import Random
