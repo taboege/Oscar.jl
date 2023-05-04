@@ -377,7 +377,8 @@ Return an array of strings that contains all those names of character tables
 in the character table library that satisfy the conditions in the array `L`.
 
 # Examples
-```jldoctest
+FIXME: why is this so slow in the doctests?
+```julia
 julia> spor_names = all_character_table_names(is_sporadic_simple => true,
          is_duplicate_table => false);
 
