@@ -59,4 +59,44 @@ end</code></pre></div></section><section><div><pre><code class="nohighlight hljs
    @show_name(io, A)
    @show_special(io, A)
 
-   ... usual stuff</code></pre><p><code>@show_special</code> checks if an attribute <code>:show_special</code> is present. If so, it has to be a function taking <code>IO</code> and the object. This is then called instead of the usual <code>show</code> function.</p><p><code>@show_name</code> will check if there is a variable in global (<code>Main</code> module) namespace with value bound to the object. In compact printing mode, the name is then shown instead of the object.</p><p>Note: if the object is stored in several variable, the first one will be used. Also the name, once used for printing, is stored in the object - hence will not change anymore.</p></article><nav class="docs-footer"><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.24 on <span class="colophon-date" title="Sunday 14 May 2023 21:27">Sunday 14 May 2023</span>. Using Julia version 1.8.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+   ... usual stuff</code></pre><p><code>@show_special</code> checks if an attribute <code>:show_special</code> is present. If so, it has to be a function taking <code>IO</code> and the object. This is then called instead of the usual <code>show</code> function.</p><p><code>@show_name</code> will check if there is a variable in global (<code>Main</code> module) namespace with value bound to the object. In compact printing mode, the name is then shown instead of the object.</p><p>Note: if the object is stored in several variable, the first one will be used. Also the name, once used for printing, is stored in the object - hence will not change anymore.</p><h2 id="Advanced-printing"><a class="docs-heading-anchor" href="#Advanced-printing">Advanced printing</a><a id="Advanced-printing-1"></a><a class="docs-heading-anchor-permalink" href="#Advanced-printing" title="Permalink"></a></h2><p>To facilitate printing of nested mathematical structures, we provide a modified <code>IOCustom</code> object, that supports indendation and decapitalization.</p><h3 id="Example"><a class="docs-heading-anchor" href="#Example">Example</a><a id="Example-1"></a><a class="docs-heading-anchor-permalink" href="#Example" title="Permalink"></a></h3><p>We illustrate this with an example</p><pre><code class="nohighlight hljs">struct A{T}
+  x::T
+end
+
+function Base.show(io::IO, a::A)
+  io = AbstractAlgebra.pretty(io)
+  println(io, &quot;Something of type A&quot;)
+  print(io, AbstractAlgebra.Indent(), &quot;over &quot;, AbstractAlgebra.Lowercase(), a.x)
+  print(io, AbstractAlgebra.Dedent()) # don&#39;t forget to undo the indentation!
+end
+
+struct B
+end
+
+function Base.show(io::IO, b::B)
+  io = AbstractAlgebra.pretty(io)
+  print(io, LowercaseOff(), &quot;Hilbert thing&quot;)
+end</code></pre><p>At the REPL, this will then be printed as follows:</p><pre><code class="nohighlight hljs">julia&gt; A(2)
+Something of type A
+  over 2
+
+julia&gt; A(A(2))
+Something of type A
+  over something of type A
+    over 2
+
+julia&gt; A(B())
+Something of type A
+  over Hilbert thing</code></pre><h3 id="Documentation"><a class="docs-heading-anchor" href="#Documentation">Documentation</a><a id="Documentation-1"></a><a class="docs-heading-anchor-permalink" href="#Documentation" title="Permalink"></a></h3><article class="docstring"><header><a class="docstring-binding" id="pretty" href="#pretty"><code>pretty</code></a> — <span class="docstring-category">Function</span></header><section><div><pre><code class="language-julia hljs">pretty(io::IO) -&gt; IOCustom</code></pre><p>Wrap <code>io</code> into an <code>IOCustom</code> object.</p><p><strong>Examples</strong></p><pre><code class="language-repl hljs">julia&gt; io = AbstractAlgebra.pretty(stdout);</code></pre></div></section></article><article class="docstring"><header><a class="docstring-binding" id="Indent" href="#Indent"><code>Indent</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia hljs">Indent</code></pre><p>When printed to an <code>IOCustom</code> object, increases the indendation level by one.</p><p><strong>Examples</strong></p><pre><code class="language-repl hljs">julia&gt; io = AbstractAlgebra.pretty(stdout);
+
+julia&gt; print(io, AbstractAlgebra.Indent(), &quot;This is indented&quot;)
+  This is indented</code></pre></div></section></article><article class="docstring"><header><a class="docstring-binding" id="Dedent" href="#Dedent"><code>Dedent</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia hljs">Dedent</code></pre><p>When printed to an <code>IOCustom</code> object, decreases the indendation level by one.</p><p><strong>Examples</strong></p><pre><code class="language-repl hljs">julia&gt; io = AbstractAlgebra.pretty(stdout);
+
+julia&gt; print(io, AbstractAlgebra.Indent(), AbstractAlgebra.Dedent(), &quot;This is indented&quot;)
+This is indented</code></pre></div></section></article><article class="docstring"><header><a class="docstring-binding" id="Lowercase" href="#Lowercase"><code>Lowercase</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia hljs">Lowercase</code></pre><p>When printed to an <code>IOCustom</code> object, the next letter printed will be lowercase.</p><p><strong>Examples</strong></p><pre><code class="language-repl hljs">julia&gt; io = AbstractAlgebra.pretty(stdout);
+
+julia&gt; print(io, AbstractAlgebra.Lowercase(), &quot;Foo&quot;)
+foo</code></pre></div></section></article><article class="docstring"><header><a class="docstring-binding" id="LowercaseOff" href="#LowercaseOff"><code>LowercaseOff</code></a> — <span class="docstring-category">Type</span></header><section><div><pre><code class="language-julia hljs">LowercaseOff</code></pre><p>When printed to an <code>IOCustom</code> object, the case of the next letter will not be changed when printed.</p><p><strong>Examples</strong></p><pre><code class="language-repl hljs">julia&gt; io = AbstractAlgebra.pretty(stdout);
+
+julia&gt; print(io, AbstractAlgebra.Lowercase(), AbstractAlgebra.LowercaseOff(), &quot;Foo&quot;)
+Foo</code></pre></div></section></article></article><nav class="docs-footer"><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.24 on <span class="colophon-date" title="Monday 15 May 2023 06:44">Monday 15 May 2023</span>. Using Julia version 1.8.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
