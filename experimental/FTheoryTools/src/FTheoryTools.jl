@@ -16,5 +16,6 @@ include("standard_constructions.jl")
 
 include("LiteratureTateModels/constructors.jl")
 include("LiteratureTateModels/create_index.jl")
+include("serialization.jl")
 
 include("exports.jl")
